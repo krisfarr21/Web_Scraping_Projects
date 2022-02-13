@@ -4,9 +4,9 @@
 # https://docs.scrapy.org/en/latest/topics/items.html
 
 import scrapy
+from scrapy.item import Item
 
 
-class BargainPricesItem(scrapy.Item):
+class BargainPricesItem(Item):
     # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    next_page = scrapy.Field()
