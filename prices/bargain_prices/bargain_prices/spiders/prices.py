@@ -1,29 +1,38 @@
 import scrapy
 from scrapy_splash import SplashRequest
-from bargain_prices.items import BargainPricesItem
+from bargain_prices.items import BargainPricesItem # for future itemloader
 
 class prices_spider(scrapy.Spider):
     name =  'prices'
-    # def start_requests(self):
-    urls = []
-    def __init__(self, name='prices', **kwargs):
-        super().__init__(name, **kwargs)
-        self.start_urls = ['''http://localhost:8050/render.html?url=
-                    https://www.greens.com.mt/products?cat=fruitsandvegetables&wait=4''']
+    local_host = 'http://localhost:8050/render.html?url='
+    # next task: change start url to greens homepage
+    start_url = 'https://www.greens.com.mt/products?cat=fruitsandvegetables'
 
-        # iterating through page numbers instead of following pagination
-        #         # for page in range(1, 20):
-        #     urls.append(f'https://www.greens.com.mt/products?cat=fruitsandvegetables&pg={page}&sort=Position&sortd=Asc')
-        # for url in urls:
-        # yield SplashRequest(url=start_url, callback=self.parse, args={'wait': 4})
+    def start_requests(self):
+        yield SplashRequest(url=self.start_url, callback=self.parse, args={'wait': 4})
+
+    # next task: get links for categories and check if you can use response.follow
+
+    def check_next_url(self, response):
+        '''
+        Checks if next page exists
+        '''
+        next_page = response.xpath('//*[@id="pnlPagesTop"]/a[4]/@href').extract()
+        if next_page:
+            return next_page[0]
+        return False
     
     def parse(self, response, **kwargs):
-
+        # yield requests for each page
         for product in response.css('div.col-md-2.col-sm-3.shop-grid-item'):
             yield { 
             'product_name' : product.css('a.title.product-title::text').get(),
             'product_price' : product.css('div.current::text').get(),
             }
+        next_page = self.check_next_url(response=response)
+        if next_page:
+            yield SplashRequest(url=next_page, callback=self.parse, args={'wait': 4})
+
         # next_page = response.css('#pnlPagesBottom > a:nth-child(5)::attr(href)').extract_first()
         # if next_page:
         #     yield response.follow(url= 'http://localhost:8050/render.html?url=' + next_page + '&wait=4', 
