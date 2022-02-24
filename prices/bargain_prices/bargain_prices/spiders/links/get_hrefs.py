@@ -3,7 +3,7 @@ import os
 from typing import Dict
 #rudimentary function to get green links into dictionary
 THIS_FOLDER = os.path.dirname(os.path.abspath(__file__))
-print(THIS_FOLDER)
+
 def green_categories(file_name='greens_links.txt') -> Dict:
     '''
     outputs dictionaries {categories:urls}
@@ -18,5 +18,3 @@ def green_categories(file_name='greens_links.txt') -> Dict:
                     'winecellar']
         urls_cat = dict(zip(categories, urls))
     return urls_cat
-
-print(green_categories())
