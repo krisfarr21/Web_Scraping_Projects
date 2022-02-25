@@ -6,7 +6,9 @@
 import scrapy
 from scrapy.item import Item
 
-
 class BargainPricesItem(Item):
     # define the fields for your item here like:
+    product_category = scrapy.Field()
+    product_name = scrapy.Field()
+    product_price = scrapy.Field()
     next_page = scrapy.Field()
