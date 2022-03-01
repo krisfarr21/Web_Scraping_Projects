@@ -5,6 +5,7 @@
 
 
 # useful for handling different item types with a single interface
+import pymongo # to integrate in later stages
 from itemadapter import ItemAdapter
 
 
