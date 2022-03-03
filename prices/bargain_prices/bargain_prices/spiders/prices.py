@@ -6,7 +6,9 @@ import time
 # import os
 import regex as re
 import subprocess, argparse
-from bargain_prices.spiders.links.hrefs import greens_categories
+from bargain_prices.spiders.links.hrefs import *
+import playwright
+from scrapy_playwright.page import PageCoroutine
 
 class GreensPricesSpider(scrapy.Spider):
     name = 'greens'
@@ -44,11 +46,23 @@ class ArkadiaPricesSpider(scrapy.Spider):
     start_urls = ['https://malta.arkadiafoodstore.com/product-category/bakery/']
 
     def start_requests(self):
-        for url in self.start_urls:
-            yield SplashRequest(url=url, callback=self.parse, args={'wait':2})
-    
-    def parse(self, response):
-        print("TITLE:", response.css('title::text').get())
+        yield scrapy.Request(
+            url=self.start_urls[0],
+            meta=dict(
+                playwright=True,
+                playwright_include_page=True,
+                playwright_page_coroutines=[
+                    PageCoroutine("wait_for_selector", "body > div.container > div > div.container > div > div.col-sm-12.col-md-9 > div > nav"),
+                    PageCoroutine("evaluate", "window.scrollBy(0, document.body.scrollHeight)"),
+                    PageCoroutine("wait_for_selector", "body > div.container > div > div.container > div > div.col-sm-12.col-md-9 > div > nav.woocommerce-custom-loadmore.no-more"),  # 10 per page
+                ],
+            ),
+        )
+    async def parse(self, response):
+        yield {
+            'title' : response.css('title::text').get(),
+            'product_name' : response.css('h2.woocommerce-loop-product__title::text').getall()
+        }
 
 
 # def main():

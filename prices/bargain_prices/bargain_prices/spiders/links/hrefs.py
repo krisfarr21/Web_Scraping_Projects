@@ -1,6 +1,8 @@
+# Functions returning links of categories in different websites - the links are first scraped through the scrapy interacative terminal
+
 def greens_categories():
     '''
-    Output: links for each category in greens (acquired through scrapy shell)
+    Output: links for each category in greens 
     '''
     base_url = 'https://www.greens.com.mt'
     categories = ['/products?cat=chilledanddairy',
