@@ -7,3 +7,7 @@
 ## Online News
 
 -  Extracting Maltese news (in English) to implement text summarization techniques
+
+### How to setup scrapy-splash integration:
+
+- To edit later
