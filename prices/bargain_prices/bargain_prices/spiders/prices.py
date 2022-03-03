@@ -1,16 +1,15 @@
 from unicodedata import category
-from h11 import Response
 import scrapy
 from multiprocessing.sharedctypes import Value
 from scrapy_splash import SplashRequest
-from bargain_prices.spiders.links.hrefs import *
 import time
 # import os
 import regex as re
 import subprocess, argparse
+from bargain_prices.spiders.links.hrefs import greens_categories
 
 class GreensPricesSpider(scrapy.Spider):
-    name = 'greens_prices'
+    name = 'greens'
     start_urls = greens_categories()
     next_page = None
 
@@ -38,6 +37,19 @@ class GreensPricesSpider(scrapy.Spider):
                 yield SplashRequest(url=self.next_page[0], callback=self.parse, args={'wait': 2})
             except: 
                 print("Next page not found")
+
+class ArkadiaPricesSpider(scrapy.Spider):
+    name = 'arkadia'
+
+    start_urls = ['https://malta.arkadiafoodstore.com/product-category/bakery/']
+
+    def start_requests(self):
+        for url in self.start_urls:
+            yield SplashRequest(url=url, callback=self.parse, args={'wait':2})
+    
+    def parse(self, response):
+        print("TITLE:", response.css('title::text').get())
+
 
 # def main():
 #     subprocess.run(["scrapy", "crawl", "prices", "-a", "category=bakery"], capture_output=True)

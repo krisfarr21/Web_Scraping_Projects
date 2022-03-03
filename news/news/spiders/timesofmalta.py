@@ -6,7 +6,7 @@ from scrapy_splash import SplashRequest
 class TimesofmaltaSpider(scrapy.Spider):
     name = 'timesofmalta'
     allowed_domains = ['https://timesofmalta.com']
-    start_urls = ['http://timesofmalta.com/']
+    start_urls = ['https://timesofmalta.com/']
 
     # def __init__(self) -> None:
     #     super().__init__()
@@ -17,6 +17,7 @@ class TimesofmaltaSpider(scrapy.Spider):
 
     def parse(self, response):
         main_news = response.css("div.sw-InnerGrid a::attr(href)").getall()
-
+        
         for news in main_news:
+            pass
 
