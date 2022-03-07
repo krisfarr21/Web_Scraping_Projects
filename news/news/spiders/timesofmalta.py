@@ -10,7 +10,7 @@ class TimesofmaltaSpider(scrapy.Spider):
     start_urls = ['https://timesofmalta.com/']
 
     def parse(self, response):
-        return SplashRequest(url=self.start_urls[0], callback=self.parse_categories, args={'wait': 4})
+        return SplashRequest(url=self.start_urls[0], callback=self.parse_categories, args={'wait': 2.5})
 
     
     def parse_categories(self, response):
@@ -35,12 +35,12 @@ class TimesofmaltaSpider(scrapy.Spider):
         self.logger.info("CATEGORY ARTICLE LINKS %s", self.category_article_links)
         
         for cat in self.categories_links[1:2]:
-            yield SplashRequest(url=cat, callback=self.parse_page_links, args={'wait': 5})
+            yield SplashRequest(url=cat, callback=self.parse_page_links, args={'wait': 2.5})
 
     def parse_page_links(self, response):
         # current page and category
         self.current_category = response.css('div.li-ListingArticles_head.wi-WidgetHeader > h1::text').get()
-        self.current_page = response.css('div.pi-Pagination > span.current::text').get()
+        # self.current_page = response.css('div.pi-Pagination > span.current::text').get()
 
         
         # article links
@@ -57,10 +57,10 @@ class TimesofmaltaSpider(scrapy.Spider):
         # checking if next page exists
         next_page = response.css('span.next > a::attr(href)').get()
         if next_page is not None: # and int(next_page[next_page.index(':')+1:]) < 100: # scrape only the next 100 pages 
-            yield SplashRequest(self.start_urls[0]+next_page[1:], callback=self.parse_page_links, args={'wait': 5, "timeout": 3000})
+            yield SplashRequest(self.start_urls[0]+next_page[1:], callback=self.parse_page_links, args={'wait': 2.5, "timeout": 3000})
         else:
             for article_link in self.category_article_links[self.current_category]:
-                yield SplashRequest(url=article_link, callback=self.parse_info, args={'wait': 5, "timeout": 3000})
+                yield SplashRequest(url=article_link, callback=self.parse_info, args={'wait': 2.5, "timeout": 3000})
                 # self.logger.info("AFTER SCRAPING EVERYTHING %s", self.category_article_links, len(self.category_article_links[self.current_category]))
     
 
@@ -68,7 +68,7 @@ class TimesofmaltaSpider(scrapy.Spider):
         yield {
             'url' : response.url,
             'current category': self.current_category,
-            'current page': self.current_page,
+            'date': response.css('div.wi-WidgetMeta > span::text').get(),
             'title' : response.css('h1.wi-WidgetSubCompType_13-title::text').get(),
             'subtitle' :  response.css('h2.wi-WidgetSubCompType_13-subtitle::text').get(),
             'tags' : response.css('div.ar-ArticleHeader-Standard_sub.ar-ArticleHeader-Standard_sub-1.wi-WidgetSubCompType_13 \
@@ -77,25 +77,3 @@ class TimesofmaltaSpider(scrapy.Spider):
             'article' : response.css('div.ar-Article_Content > p::text').getall()
         
         }
-
-
-   # def parse_info(self, response):
-
-
-    #     self.category_article_links[self.current_category].extend(articles_links) # adding links to dictionary
-    #     # pages = sorted([self.start_urls[0]+link[1:] for link in links if '/page:' in link]) # saving pagination links and adding base_url to paginated links
-    #     # yield {
-    #     #     'category article links': self.category_article_links,
-    #     #     'current category': self.current_category }
-    #     #     'current page': current_page,
-    #     #     'links': articles_links}
-    #     next_page = response.css('span.next > a::attr(href)').get()
-    #     if next_page:
-    #         self.logger.info("REQUESTING NEXT PAGE")
-    #         yield SplashRequest(url=self.start_urls[0]+next_page[1:], callback=self.parse_links, args={'wait':5})
-    #     else:
-    #         self.logger.info("REQUESTING LINKS IN CATEGORY")
-    #         yield {'category_articles' : self.category_article_links}
-    #         print("LENGTH OF ELECTION 2022 ARTICLES", self.category_article_links[self.current_category])
-    #         for url in self.category_article_links[self.current_category]:
-    #             yield SplashRequest(url=url, callback=self.parse_info, args={'wait': 5})
