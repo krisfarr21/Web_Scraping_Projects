@@ -34,8 +34,8 @@ class TimesofmaltaSpider(scrapy.Spider):
         self.category_article_links = {k.lower():[] for k in self.categories_names}
         self.logger.info("CATEGORY ARTICLE LINKS %s", self.category_article_links)
         
-        for cat in self.categories_links[1:2]:
-            yield SplashRequest(url=cat, callback=self.parse_page_links, args={'wait': 2.5})
+        for cat in self.categories_links[:1]:
+            yield SplashRequest(url=cat, callback=self.parse_page_links, args={'wait': 3})
 
     def parse_page_links(self, response):
         # current page and category
@@ -56,13 +56,14 @@ class TimesofmaltaSpider(scrapy.Spider):
 
         # checking if next page exists
         next_page = response.css('span.next > a::attr(href)').get()
-        if next_page is not None: # and int(next_page[next_page.index(':')+1:]) < 100: # scrape only the next 100 pages 
-            yield SplashRequest(self.start_urls[0]+next_page[1:], callback=self.parse_page_links, args={'wait': 2.5, "timeout": 3000})
+        if next_page is not None and int(next_page[next_page.index(':')+1:]) < 10: # scrape only the next 100 pages 
+            yield SplashRequest(self.start_urls[0]+next_page[1:], callback=self.parse_page_links, args={'wait': 4, "timeout": 3000})
         else:
             for article_link in self.category_article_links[self.current_category]:
-                yield SplashRequest(url=article_link, callback=self.parse_info, args={'wait': 2.5, "timeout": 3000})
+                yield SplashRequest(url=article_link, callback=self.parse_info, args={'wait': 4, "timeout": 3000})
                 # self.logger.info("AFTER SCRAPING EVERYTHING %s", self.category_article_links, len(self.category_article_links[self.current_category]))
     
+    # https://stackoverflow.com/questions/71146154/scrapy-splash-error-gave-up-retrying-504-gateway-time-out
 
     def parse_info(self, response):
         yield {

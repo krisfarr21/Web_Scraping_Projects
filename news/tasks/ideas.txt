@@ -1,0 +1,12 @@
+Tasks:
+
+i) Add Item pipeline
+ii) Investigate if CrawlSpider works faster than current solution
+
+Ideas:
+
+i) for EDA: a) linear relation between NUM min read and word count (to predict other articles?)
+            b) word count and word length
+            c) articles and their word count
+            d) 
+
