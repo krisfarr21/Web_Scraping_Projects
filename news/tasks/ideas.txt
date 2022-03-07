@@ -2,6 +2,7 @@ Tasks:
 
 i) Add Item pipeline
 ii) Investigate if CrawlSpider works faster than current solution
+iii) Add scraped data to a RDMS
 
 Ideas:
 
